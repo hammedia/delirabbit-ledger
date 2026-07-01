@@ -1086,6 +1086,9 @@
       createdAt: existing ? existing.createdAt : nowIso(),
       updatedAt: nowIso()
     };
+    if (record.date) {
+      selectedMonth = record.date.slice(0, 7);
+    }
     if (existingIndex >= 0) {
       profile.records[existingIndex] = record;
       flashText = "기록을 갱신했습니다.";
