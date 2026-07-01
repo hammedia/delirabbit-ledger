@@ -340,6 +340,29 @@ button:focus-visible {
   min-width: 70px;
 }
 
+.month-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -2px 0 14px;
+}
+
+.month-chip {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  background: #f7faf9;
+  color: var(--green-dark);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.month-chip.is-active {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+
 .compact-empty {
   padding: 12px;
 }

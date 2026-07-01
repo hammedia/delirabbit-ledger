@@ -327,6 +327,20 @@
     }).join(" · ");
   }
 
+  function recordMonths(profile) {
+    const months = new Set();
+    (profile.records || []).forEach(function (record) {
+      if (record.date && record.date.length >= 7) months.add(record.date.slice(0, 7));
+    });
+    return Array.from(months).sort().reverse();
+  }
+
+  function monthLabel(month) {
+    const parts = String(month || "").split("-");
+    if (parts.length !== 2) return month;
+    return `${Number(parts[0])}년 ${Number(parts[1])}월`;
+  }
+
   function parseKakaoText(rawText, profileName) {
     const rawLines = String(rawText || "").replace(/\r/g, "\n").split("\n");
     const lines = rawLines.map(function (line) {
@@ -676,7 +690,7 @@
           </div>
         </div>
         <div class="summary-grid" id="today-summary">
-          ${todaySummaryHtml(amounts)}
+          ${todaySummaryHtml(currentDraft, amounts)}
         </div>
         <label>메모
           <input type="text" data-draft="memo" value="${escapeHtml(currentDraft.memo)}" />
@@ -715,8 +729,9 @@
     }).join("");
   }
 
-  function todaySummaryHtml(amounts) {
+  function todaySummaryHtml(record, amounts) {
     return `
+      <div class="metric"><span>배송 기준</span><strong>${integerValue(record.deliveredCount).toLocaleString("ko-KR")}건</strong></div>
       <div class="metric"><span>기본 수입</span><strong>${money(amounts.baseAmount)}</strong></div>
       <div class="metric"><span>추가 수입</span><strong>${money(amounts.extraAmount)}</strong></div>
       <div class="metric total"><span>일일 총액</span><strong>${money(amounts.grossAmount)}</strong></div>
@@ -724,6 +739,10 @@
   }
 
   function monthView(profile) {
+    const months = recordMonths(profile);
+    if (months.length && !months.includes(selectedMonth)) {
+      selectedMonth = months[0];
+    }
     const records = profile.records
       .filter(function (record) { return record.date && record.date.slice(0, 7) === selectedMonth; })
       .sort(function (a, b) { return a.date.localeCompare(b.date); });
@@ -769,6 +788,13 @@
             <input id="month-picker" type="month" value="${escapeHtml(selectedMonth)}" />
           </label>
         </div>
+        ${months.length ? `
+          <div class="month-shortcuts">
+            ${months.map(function (month) {
+              return `<button class="month-chip ${month === selectedMonth ? "is-active" : ""}" type="button" data-action="select-month" data-month="${escapeHtml(month)}">${escapeHtml(monthLabel(month))}</button>`;
+            }).join("")}
+          </div>
+        ` : ""}
         <div class="summary-grid">
           <div class="metric"><span>근무일수</span><strong>${totals.days.toLocaleString("ko-KR")}일</strong></div>
           <div class="metric"><span>총 배송건수</span><strong>${totals.delivered.toLocaleString("ko-KR")}건</strong></div>
@@ -931,6 +957,11 @@
       updateDraftFromInputs(profile);
       updateAppliedUnitPrice();
       syncAllowanceItemsFromInputs(profile);
+      if (!confirmZeroDeliverySave(draft)) {
+        flash("배송건수를 확인해 주세요.");
+        focusDraftInput("deliveredCount");
+        return;
+      }
       saveRecord(profile);
     });
 
@@ -1051,7 +1082,23 @@
   function updateTodaySummary() {
     const summary = document.getElementById("today-summary");
     if (!summary) return;
-    summary.innerHTML = todaySummaryHtml(computeAmounts(draft));
+    summary.innerHTML = todaySummaryHtml(draft, computeAmounts(draft));
+  }
+
+  function confirmZeroDeliverySave(record) {
+    if (integerValue(record.deliveredCount) > 0) return true;
+    const assigned = integerValue(record.assignedCount);
+    const assignedText = assigned > 0 ? `\n배정건수는 ${assigned.toLocaleString("ko-KR")}건입니다.` : "";
+    return window.confirm(`배송건수가 0건입니다.${assignedText}\n0건으로 저장하면 금액도 0원으로 계산됩니다.\n그래도 저장할까요?`);
+  }
+
+  function focusDraftInput(key) {
+    window.setTimeout(function () {
+      const input = app.querySelector(`[data-draft='${key}']`);
+      if (!input) return;
+      input.focus();
+      input.scrollIntoView({ block: "center" });
+    }, 0);
   }
 
   function saveRecord(profile) {
@@ -1106,6 +1153,13 @@
     picker.addEventListener("change", function () {
       selectedMonth = picker.value || monthValue(new Date());
       render();
+    });
+
+    app.querySelectorAll("[data-action='select-month']").forEach(function (button) {
+      button.addEventListener("click", function () {
+        selectedMonth = button.dataset.month;
+        render();
+      });
     });
 
     app.querySelectorAll("[data-action='edit-record']").forEach(function (button) {

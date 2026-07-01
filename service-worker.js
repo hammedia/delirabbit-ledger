@@ -1,4 +1,4 @@
-const CACHE_NAME = "delirabbit-ledger-v4";
+const CACHE_NAME = "delirabbit-ledger-v6";
 const APP_SHELL = [
   "./",
   "./index.html",
