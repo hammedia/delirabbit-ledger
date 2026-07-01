@@ -1,0 +1,24 @@
+{
+  "name": "딜리래빗 정산 기록",
+  "short_name": "딜리래빗",
+  "description": "딜리래빗 일일 기록과 월 정산",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#10735c",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%2310735c'/%3E%3Cpath d='M48 61h96v70H48z' fill='%23fff'/%3E%3Cpath d='M48 61l48 34 48-34' fill='none' stroke='%2310735c' stroke-width='12' stroke-linejoin='round'/%3E%3Cpath d='M64 139h64' stroke='%23fff' stroke-width='14' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%2310735c'/%3E%3Cpath d='M128 162h256v188H128z' fill='%23fff'/%3E%3Cpath d='M128 162l128 92 128-92' fill='none' stroke='%2310735c' stroke-width='32' stroke-linejoin='round'/%3E%3Cpath d='M176 374h160' stroke='%23fff' stroke-width='38' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
